@@ -36,6 +36,7 @@
         <module>kudu</module>
         <module>phoenix</module>
         <module>tablestore</module>
+        <module>esCustom</module>
     </modules>
 
     <licenses>

@@ -1,0 +1,51 @@
+{
+  "aliases": {},
+  "mappings": {
+    "properties": {
+      "age": {
+        "type": "integer"
+      },
+      "c_time": {
+        "type": "date",
+        "format": "yyyy-MM-dd HH:mm:ss||strict_date_optional_time||epoch_millis"
+      },
+      "del_flag": {
+        "type": "integer"
+      },
+      "id": {
+        "type": "long"
+      },
+      "name": {
+        "type": "text"
+      },
+      "role": {
+        "type": "nested",
+        "properties": {
+          "role_id": {
+            "type": "long"
+          },
+          "role_name": {
+            "type": "text"
+          }
+        }
+      },
+      "tag": {
+        "type": "nested",
+        "properties": {
+          "tag_id": {
+            "type": "long"
+          },
+          "tag_name": {
+            "type": "text"
+          }
+        }
+      }
+    }
+  },
+  "settings": {
+    "index": {
+      "number_of_shards": "3",
+      "number_of_replicas": "1"
+    }
+  }
+}

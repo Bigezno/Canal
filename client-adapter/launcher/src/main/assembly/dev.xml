@@ -1,11 +1,11 @@
 <assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
-	<id>dist</id>
-	<formats>
-		<format>dir</format>
-	</formats>
-	<includeBaseDirectory>false</includeBaseDirectory>
-	<fileSets>
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+    <id>dist</id>
+    <formats>
+        <format>dir</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
         <fileSet>
             <directory>.</directory>
             <outputDirectory>/</outputDirectory>
@@ -46,6 +46,13 @@
         <fileSet>
             <directory>../es8x/src/main/resources/es8</directory>
             <outputDirectory>/conf/es8</outputDirectory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>../esCustom/src/main/resources/esCustom</directory>
+            <outputDirectory>/conf/esCustom</outputDirectory>
             <includes>
                 <include>**/*</include>
             </includes>

@@ -1,0 +1,145 @@
+esIndex: t_test_user
+tableEsMappings:
+  # kafka的topic
+  - destination: t_test_user_topic
+    group: g1
+    mainTable: true
+    # 主表
+    tableName: t_test_user
+    # 数据库
+    database: es_sync
+    esMapping:
+      # 主表中字段所在es索引中的字段
+      esFields: "id, name, age, c_time, del_flag"
+      # 主表中esId字段
+      esId: id
+      # 数据源
+      dataSourceKey: defaultDS
+
+    # 关联关系
+    relations:
+      # 关联字段
+      - relationFields: id
+        # 数据源
+        dataSourceKey: defaultDS
+        # ES字段的查询sql
+        sql: "  select t.user_id as user_id, concat('[', group_concat(json_object('role_id', t.role_id, 'role_name', t.role_name)), ']') as role 
+                from (
+                    select user_role.user_id, role.id as role_id, role.role_name as role_name from t_test_user_role as user_role
+                    left join t_test_role as role on user_role.role_id = role.id 
+                    where user_role.del_flag = 0 and role.del_flag = 0 and user_role.user_id = ?
+                ) as t group by t.user_id "
+        # es字段名
+        esFields: role
+        # 复杂对象，此部分跟client-adapter的配置相同
+        objFields:
+          role: object
+
+      - relationFields: id
+        dataSourceKey: defaultDS
+        sql: "  select t.user_id as user_id, concat('[', group_concat(json_object('tag_id', t.tag_id, 'tag_name', t.tag_name)), ']') as tag 
+                from (
+                    select user_tag.user_id, tag.id as tag_id, tag.name as tag_name from t_test_user_tag as user_tag
+                    left join t_test_tag as tag on user_tag.tag_id = tag.id 
+                    where user_tag.del_flag = 0 and tag.del_flag = 0 and user_tag.user_id = ?
+                ) as t group by t.user_id "
+        esFields: tag
+        objFields:
+          tag: object
+
+
+
+  - destination: t_test_role_topic
+    group: g1
+    tableName: t_test_role
+    esMapping:
+      dataSourceKey: defaultDS
+      # 该表查找esId的sql
+      searchEsIdSql: " select user_id from `es_sync`.t_test_user_role where role_id = ? "
+      # 该表查找esId的sql的条件字段，多条件以","分割, 同时字段只能在该表中
+      searchEsIdConditionFields: id
+      # 该表所影响的es字段
+      esFields: role
+      # 复杂对象，此部分跟client-adapter的配置相同
+      objFields:
+        role: object
+      # 白名单字段，除了esFields中的字段、relationFields关联中的字段、以及白名单whiteListFields中的字段外，其余字段的修改不会更新索引
+      whiteListFields: del_flg
+      # sql中的esId的字段
+      esId: user_id
+      # esFields查询出来的值
+      sql: "  select t.user_id as user_id, concat('[', group_concat(json_object('role_id', t.role_id, 'role_name', t.role_name)), ']') as role 
+              from (
+                  select user_role.user_id, role.id as role_id, role.role_name as role_name from t_test_user_role as user_role
+                  left join t_test_role as role on user_role.role_id = role.id 
+                  where user_role.del_flag = 0 and role.del_flag = 0 and user_role.user_id in(?)
+              ) as t group by t.user_id "
+      # 关联字段, 当该字段的值有所改动时，意味着关联关系有所变化，其索引中esFields的值也需要更新
+      relationFields: id
+
+
+  - destination: t_test_user_role_topic
+    group: g1
+    tableName: t_test_user_role
+    esMapping:
+      dataSourceKey: defaultDS
+      # 当不配置searchEsIdSql时, 默认从dml中查找，也就是该表中存在esId的字段，比如该表里面的user_id字段
+      # searchEsIdSql:
+      # 该表所影响的es字段
+      esFields: role
+      # 复杂对象，此部分跟client-adapter的配置相同
+      objFields:
+        role: object
+      # 白名单字段，除了esFields中的字段、relationFields关联中的字段、以及白名单whiteListFields中的字段外，其余字段的修改不会更新索引
+      whiteListFields: del_flg
+      # sql中的esId的字段
+      esId: user_id
+      # esFields查询出来的值
+      sql: "  select t.user_id as user_id, concat('[', group_concat(json_object('role_id', t.role_id, 'role_name', t.role_name)), ']') as role 
+              from (
+                  select user_role.user_id, role.id as role_id, role.role_name as role_name from t_test_user_role as user_role
+                  left join t_test_role as role on user_role.role_id = role.id 
+                  where user_role.del_flag = 0 and role.del_flag = 0 and user_role.user_id in(?)
+              ) as t group by t.user_id "
+      # 关联字段, 当该字段的值有所改动时，意味着关联关系有所变化，其索引中esFields的值也需要更新
+      relationFields: id
+
+
+  - destination: t_test_tag_topic
+    group: g1
+    tableName: t_test_tag
+    esMapping:
+      dataSourceKey: defaultDS
+      searchEsIdSql: " select user_id from `es_sync`.t_test_user_tag where tag_id = ? "
+      searchEsIdConditionFields: id
+      esFields: tag
+      objFields:
+        tag: object
+      whiteListFields: del_flg
+      esId: user_id
+      sql: "  select t.user_id as user_id, concat('[', group_concat(json_object('tag_id', t.tag_id, 'tag_name', t.tag_name)), ']') as tag 
+              from (
+                  select user_tag.user_id, tag.id as tag_id, tag.name as tag_name from t_test_user_tag as user_tag
+                  left join t_test_tag as tag on user_tag.tag_id = tag.id 
+                  where user_tag.del_flag = 0 and tag.del_flag = 0 and user_tag.user_id in (?)
+              ) as t group by t.user_id "
+      relationFields: id
+
+
+  - destination: t_test_user_tag_topic
+    group: g1
+    tableName: t_test_user_tag
+    esMapping:
+      dataSourceKey: defaultDS
+      esFields: tag
+      objFields:
+        tag: object
+      whiteListFields: del_flg
+      esId: user_id
+      sql: "  select t.user_id as user_id, concat('[', group_concat(json_object('tag_id', t.tag_id, 'tag_name', t.tag_name)), ']') as tag 
+              from (
+                  select user_tag.user_id, tag.id as tag_id, tag.name as tag_name from t_test_user_tag as user_tag
+                  left join t_test_tag as tag on user_tag.tag_id = tag.id 
+                  where user_tag.del_flag = 0 and tag.del_flag = 0 and user_tag.user_id in (?)
+              ) as t group by t.user_id "
+      relationFields: id

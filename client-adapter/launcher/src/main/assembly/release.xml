@@ -52,6 +52,13 @@
             </includes>
         </fileSet>
         <fileSet>
+            <directory>../esCustom/src/main/resources/esCustom</directory>
+            <outputDirectory>/conf/esCustom</outputDirectory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>../hbase/src/main/resources/hbase</directory>
             <outputDirectory>/conf/hbase</outputDirectory>
             <includes>
